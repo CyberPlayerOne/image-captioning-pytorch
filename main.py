@@ -80,4 +80,33 @@ with open(vocab_path, 'wb') as f:
 print(f'Total vocabulary size: {len(vocab)}')
 print(f'Saved the vocabulary wrapper to \'{vocab_path}\'')
 
+
 # step 2: resize images ----------------------------------------------
+def reshape_image(image, shape):
+    """Resize an image to the given shape"""
+    return image.resize(shape, Image.ANTIALIAS)
+
+
+def reshape_images(image_path, output_path, shape):
+    """Reshape the images in 'image_path' and save into 'output_path'. """
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+
+    images = os.listdir(image_path)
+    num_im = len(images)
+    for i, im in enumerate(images):
+        with open(os.path.join(image_path, im), 'r+b') as f:
+            with Image.open(f) as image:
+                image = reshape_image(image, shape)
+                image.save(os.path.join(output_path, im), image.format)
+        if (i + 1) % 100 == 0:
+            print(f"[{i + 1}/{num_im}] Resized the images and saved into '{output_path}'")
+
+
+image_path = '/media/tyler/Elements/unzipped-image-datasets/cocodataset/train2014/'
+output_path = '/media/tyler/Elements/unzipped-image-datasets/cocodataset/resized_images/'
+image_shape = [256, 256]
+reshape_images(image_path, output_path, image_shape)
+
+
+# step 3: instantiate data loader ----------------------------------------------
